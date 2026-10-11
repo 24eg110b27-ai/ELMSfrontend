@@ -27,7 +27,7 @@ function Login() {
     try {
 
       const response = await api.post("/auth/login", {
-        username,
+        username: username.trim(),
         password
       });
 
@@ -155,7 +155,7 @@ function Login() {
               <div className="input-group">
 
                 <label>
-                  Username
+                  Username or email
                 </label>
 
                 <div className="input-wrapper">
@@ -164,7 +164,7 @@ function Login() {
 
                   <input
                     type="text"
-                    placeholder="Enter your username"
+                    placeholder="Username or email"
                     value={username}
                     onChange={(e) =>
                       setUsername(e.target.value)
