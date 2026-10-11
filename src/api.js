@@ -1,9 +1,9 @@
 import axios from "axios";
+import { buildApiBaseUrl, isPublicAuthRequest } from "./apiConfig";
 
-const rawBaseUrl = import.meta.env.VITE_API_BASE_URL || "/api";
-const normalizedBaseUrl = rawBaseUrl.endsWith("/api")
-  ? rawBaseUrl
-  : `${rawBaseUrl.replace(/\/$/, "")}/api`;
+const normalizedBaseUrl = buildApiBaseUrl(
+  import.meta.env.VITE_API_BASE_URL || "/api"
+);
 
 const api = axios.create({
   baseURL: normalizedBaseUrl,
@@ -16,7 +16,11 @@ api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
 
-    if (token && !config.headers.Authorization) {
+    if (
+      token &&
+      !isPublicAuthRequest(config.url) &&
+      !config.headers.Authorization
+    ) {
       config.headers.Authorization = `Bearer ${token}`;
     }
 
@@ -30,7 +34,10 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    if (
+      error.response?.status === 401 &&
+      !isPublicAuthRequest(error.config?.url)
+    ) {
       localStorage.removeItem("token");
       localStorage.removeItem("username");
       localStorage.removeItem("role");

@@ -45,15 +45,14 @@ function Login() {
   role === "MANAGER" ? "/manager" : "/dashboard";
 
     } catch (err) {
-
-      console.error(err);
-
-      if (err.response) {
-        setError(
-          typeof err.response.data === "string"
-            ? err.response.data
-            : "Invalid username or password"
-        );
+      if (err.response?.status === 401) {
+        setError("Invalid username or password.");
+      } else if (err.response?.status === 403) {
+        setError("Sign in was forbidden. Please refresh and try again.");
+      } else if (err.response?.status === 400) {
+        setError("Please enter a valid username and password.");
+      } else if (err.response) {
+        setError("Sign in is temporarily unavailable. Please try again later.");
       } else {
         setError("Unable to connect to the server");
       }

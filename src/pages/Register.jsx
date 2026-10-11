@@ -50,14 +50,16 @@ function Register() {
       setPassword("");
       setConfirmPassword("");
     } catch (err) {
-      console.error(err);
-
-      if (err.response) {
+      if (err.response?.status === 400) {
         setError(
           typeof err.response.data === "string"
             ? err.response.data
-            : "Unable to create your account. Please check your details and try again."
+            : "Please check your account details and try again."
         );
+      } else if (err.response?.status === 403) {
+        setError("Registration was forbidden. Please refresh and try again.");
+      } else if (err.response) {
+        setError("Registration is temporarily unavailable. Please try again later.");
       } else {
         setError("Unable to connect to the server");
       }
